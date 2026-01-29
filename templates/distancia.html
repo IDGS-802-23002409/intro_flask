@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% from "_macros.html" import render_field %}
+
+{% block content %}
+<div class="mt-5 pt-5">
+    <div class="mx-auto" style="max-width: 500px;">
+        <div class="bg-dark text-white ">
+            <h4>Calculadora de Distancia</h4>
+        </div>
+        <div class="">
+            <form action="/distancia" method="POST">
+                <div class="row">
+                    <div class="col-6">
+                        {{ render_field('x1', 'X del Punto 1') }}
+                        {{ render_field('y1', 'Y del Punto 1') }}
+                    </div>
+                    <div class="col-6">
+                        {{ render_field('x2', 'X del Punto 2') }}
+                        {{ render_field('y2', 'Y del Punto 2') }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3">Calcular</button>
+            </form>
+
+            {% if resultado is not none %}
+                <div class="alert alert-success mt-4 text-center">
+                    La distancia es: <strong>{{ resultado }}</strong>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
