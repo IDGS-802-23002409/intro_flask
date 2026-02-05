@@ -1,0 +1,187 @@
+{% extends "layout.html" %}
+{% import "_macros.html" as macros %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #2B5797 !important;
+    }
+
+    .cinepolis-container {
+        background-color: #2B5797;
+        color: white;
+        padding: 20px;
+    }
+
+    .cinepolis-header {
+        background-color: #1a3a6b;
+        color: white;
+        padding: 8px 20px;
+        text-align: right;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        border: 2px solid white;
+    }
+
+    .section-box {
+        border: 2px solid white;
+        padding: 15px;
+        background-color: rgba(255, 255, 255, 0.05);
+        height: 100%;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-style: italic;
+        margin-bottom: 15px;
+        color: white;
+    }
+
+    .cinepolis-container label {
+        color: white !important;
+        font-size: 13px;
+    }
+
+    .form-control {
+        background-color: white;
+        border: 1px solid #999;
+        font-size: 13px;
+    }
+
+    .form-check-label {
+        color: white !important;
+    }
+
+    .btn-procesar {
+        background-color: #FFD700;
+        color: #000;
+        border: none;
+        padding: 6px 25px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .btn-procesar:hover {
+        background-color: #FFC700;
+        color: #000;
+    }
+
+    .cinepolis-logo {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .cinepolis-logo h1 {
+        font-size: 42px;
+        font-weight: bold;
+        color: #FFD700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .cinepolis-logo p {
+        color: white;
+        font-size: 13px;
+        margin: 0;
+        letter-spacing: 1px;
+    }
+
+    .result-text {
+        color: white;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .cinepolis-container dd {
+        margin-bottom: 10px;
+    }
+
+    .cinepolis-container td {
+        color: white;
+        font-size: 13px;
+        padding-bottom: 5px;
+    }
+</style>
+
+<div class="cinepolis-container">
+    <div class="cinepolis-header">
+        Cinépolis
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="section-box">
+                <div class="section-title">Entradas</div>
+
+                <form action="/cinepolis" method="POST">
+                    {{ form.csrf_token }}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    {{ macros.campoNuevo(form.nombre, class="form-control") }}
+                    {{ macros.campoNuevo(form.personas, class="form-control") }}
+                    {{ macros.campoNuevo(form.cantidad, class="form-control") }}
+
+                    <div class="mb-3 form-check">
+                        {{ form.tarjeta_cineco(class="form-check-input", id="tarjeta_cineco") }}
+                        <label class="form-check-label" for="tarjeta_cineco">
+                            Tarjeta Cineco
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="cinepolis-logo">
+                <h1>Cinépolis</h1>
+                <p>LA CAPITAL DEL CINE</p>
+            </div>
+
+            <div class="section-box text-center">
+                <div class="section-title">Acciones</div>
+                <button type="submit" class="btn btn-procesar"
+                    onclick="document.querySelector('form').submit()">Procesar</button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="section-box">
+                <div class="section-title">Salidas</div>
+
+                {% if resultado %}
+                <div>
+                    <p class="result-text"><strong>Valor a Pagar</strong></p>
+                    <hr style="border-color: rgba(255,255,255,0.3); margin: 10px 0;">
+                    <p class="result-text">Cliente: {{ resultado.nombre }}</p>
+                    <p class="result-text">Personas: {{ resultado.personas }}</p>
+                    <p class="result-text">Cantidad total de boletas: {{ resultado.cantidad }}</p>
+                    <p class="result-text">Boletas por persona: {{ "%.1f"|format(resultado.boletos_por_persona) }}</p>
+                    <p class="result-text">Precio por boleta: ${{ "{:,.2f}".format(resultado.precio_boleta) }}</p>
+                    <p class="result-text">Subtotal: ${{ "{:,.2f}".format(resultado.subtotal) }}</p>
+
+                    {% if resultado.descuento_cantidad > 0 %}
+                    <p class="result-text" style="color: #FFD700;">
+                        Descuento cantidad ({{ resultado.descuento_cantidad|int }}%): -${{
+                        "{:,.2f}".format(resultado.monto_descuento) }}
+                    </p>
+                    {% endif %}
+
+                    {% if resultado.tiene_tarjeta %}
+                    <p class="result-text" style="color: #FFD700;">
+                        Descuento CINECO (10%): -${{ "{:,.2f}".format(resultado.descuento_cineco) }}
+                    </p>
+                    {% endif %}
+
+                    <hr style="border-color: rgba(255,255,255,0.3); margin: 10px 0;">
+                    <p class="result-text">
+                        <strong style="font-size: 16px;">TOTAL: ${{ "{:,.2f}".format(resultado.total) }}</strong>
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
